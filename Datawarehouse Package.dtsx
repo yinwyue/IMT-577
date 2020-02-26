@@ -1,0 +1,289 @@
+﻿<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="5/8/2019 11:36:59 PM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="WINDOWS-ND1S8I5"
+  DTS:CreatorName="WINDOWS-ND1S8I5\yinwy"
+  DTS:DTSID="{67374533-4951-46D4-97BB-1781BB75C5F3}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="15.0.0900.40"
+  DTS:LocaleID="1033"
+  DTS:ObjectName="Datawarehouse Package"
+  DTS:PackageType="5"
+  DTS:VersionBuild="23"
+  DTS:VersionGUID="{750671B1-1D5B-43EC-8881-4D8DE12F2F49}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:Variables />
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\DimChannel"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{003436C3-E792-4E94-8430-FFEB959B4570}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="DimChannel"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{98396F0D-9642-4205-AB27-A36CC7B287D2}"
+          SQLTask:SqlStatementSource="IF EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'DimChannel')&#xA;BEGIN&#xA;&#x9;DROP TABLE dbo.DimChannel;&#xA;END&#xA;GO&#xA;--dimChannelKey is a surrogate key. It starts at 1 and increments by 1 with every record inserted.&#xA;CREATE TABLE dbo.DimChannel&#xA;(&#xA;dimChannelKey INT IDENTITY(1,1) CONSTRAINT PK_dimChannel PRIMARY KEY CLUSTERED NOT NULL,&#xA;ChannelID INT NULL,&#xA;Channel NVARCHAR(50) NOT NULL,&#xA;ChannelCategoryID INT NOT NULL,&#xA;ChannelCategory NVARCHAR(50) NOT NULL,&#xA;CreatedDate DATETIME NULL,&#xA;CreatedBy NVARCHAR(255) NULL,&#xA;ModifiedDate DATETIME NULL,&#xA;ModifiedBy NVARCHAR(255) NULL&#xA;);&#xA;GO&#xA;&#xA;DELETE FROM dbo.DimChannel;&#xA;GO&#xA;&#xA;/***How to reseed an identity column***/&#xA;DBCC CHECKIDENT (&quot;dbo.DimChannel&quot;, RESEED, 0);&#xA;GO&#xA;&#xA;IF EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'dimChannelView')&#xA;BEGIN&#xA;DROP VIEW dbo.dimChannelView;&#xA;END&#xA;GO&#xA;&#xA;/***How to create a view***/&#xA;CREATE VIEW dbo.dimChannelView&#xA;AS&#xA;SELECT &#xA;dimChannelKey&#xA;,ChannelID&#xA;,Channel&#xA;,ChannelCategory&#xA;,ChannelCategoryID&#xA;,CreatedDate&#xA;,CreatedBy&#xA;,ModifiedDate&#xA;,ModifiedBy&#xA;&#xA;FROM DimChannel&#xA;GO&#xA;SET IDENTITY_INSERT dbo.DimChannel ON;&#xA;&#xA;INSERT INTO dbo.DimChannel&#xA;(&#xA;dimChannelKey&#xA;,ChannelID&#xA;,Channel&#xA;,ChannelCategory&#xA;,ChannelCategoryID&#xA;,CreatedDate&#xA;,CreatedBy&#xA;,ModifiedDate&#xA;,ModifiedBy&#xA;)&#xA;VALUES&#xA;(&#xA;-1 &#xA;,0&#xA;,'Unknown'&#xA;,'Unknown'&#xA;,0&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;);&#xA;&#xA;SET IDENTITY_INSERT dbo.DimChannel OFF;&#xA;GO&#xA;&#xA;&#xA;INSERT INTO dbo.DimChannel&#xA;(&#xA;Channel&#xA;,ChannelID&#xA;,ChannelCategory&#xA;,ChannelCategoryID&#xA;,CreatedDate&#xA;,CreatedBy&#xA;,ModifiedDate&#xA;,ModifiedBy&#xA;)&#xA;SELECT &#xA;replace(dbo.StageChannel.Channel,'-','') &#xA;,ChannelID&#xA;,ChannelCategory&#xA;,dbo.ChannelCategory.ChannelCategoryID&#xA;,DATEADD(dd,DATEDIFF(dd,GETDATE(), '2013-01-01'),GETDATE()) AS CreatedDate&#xA;,'company\SQLServerServiceAccount' AS CreatedBy&#xA;,NULL AS ModifiedDate&#xA;,NULL AS ModifiedBy&#xA;FROM dbo.StageChannel&#xA;INNER JOIN dbo.ChannelCategory&#xA;on dbo.StageChannel.ChannelCategoryID = dbo.ChannelCategory.ChannelCategoryID" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\DimCustomer"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{286A69F3-7AA8-4BEF-B8ED-49C9891D66A1}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="DimCustomer"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{98396F0D-9642-4205-AB27-A36CC7B287D2}"
+          SQLTask:SqlStatementSource="&#xA;IF EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'DimCustomer')&#xA;BEGIN&#xA;&#x9;DROP TABLE dbo.DimCustomer;&#xA;END&#xA;GO&#xA;&#xA;&#xA;CREATE TABLE dbo.DimCustomer(&#xA;&#x9;dimCustomerKey INT IDENTITY(1,1) CONSTRAINT PK_dimCustomer PRIMARY KEY CLUSTERED NOT NULL,&#xA;&#x9;[CustomerID] [uniqueidentifier] NULL,&#xA;&#x9;[FirstName] [nvarchar](255) NULL,&#xA;&#x9;[LastName] [nvarchar](255) NULL,&#xA;&#x9;[Gender] [nvarchar](1) NULL,&#xA;&#x9;[EmailAddress] [nvarchar](255) NULL,&#xA;&#x9;[Address] [nvarchar](255) NULL,&#xA;&#x9;[City] [nvarchar](255) NULL,&#xA;&#x9;[StateProvince] [nvarchar](255) NULL,&#xA;&#x9;[Country] [nvarchar](255) NULL,&#xA;&#x9;[PostalCode] [nvarchar](255) NULL,&#xA;&#x9;[PhoneNumber] [nvarchar](20) NULL,&#xA;&#x9;[CreatedDate] [datetime] NULL,&#xA;&#x9;[CreatedBy] [nvarchar](255) NULL,&#xA;&#x9;[ModifiedDate] [datetime] NULL,&#xA;&#x9;[ModifiedBy] [nvarchar](255) NULL&#xA;) ON [PRIMARY]&#xA;GO&#xA;&#xA;&#xA;&#xA;DELETE FROM dbo.DimCustomer;&#xA;GO&#xA;&#xA;/***How to reseed an identity column***/&#xA;DBCC CHECKIDENT (&quot;dbo.DimCustomer&quot;, RESEED, 0);&#xA;GO&#xA;&#xA;&#xA;IF EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'dimCustomerView')&#xA;BEGIN&#xA;DROP VIEW dbo.dimCustomerView;&#xA;END&#xA;GO&#xA;&#xA;/***How to create a view***/&#xA;CREATE VIEW dbo.dimCustomerView&#xA;AS&#xA;SELECT &#xA;&#x9;dimCustomerKey,&#xA;&#x9;CustomerID,&#xA;&#x9;FirstName,&#xA;&#x9;LastName,&#xA;&#x9;Gender,&#xA;&#x9;EmailAddress,&#xA;&#x9;Address,&#xA;&#x9;City,&#xA;&#x9;StateProvince,&#xA;&#x9;Country,&#xA;&#x9;PostalCode,&#xA;&#x9;PhoneNumber,&#xA;&#x9;CreatedDate,&#xA;&#x9;CreatedBy,&#xA;&#x9;ModifiedDate,&#xA;&#x9;ModifiedBy&#xA;FROM DimCustomer&#xA;GO&#xA;&#xA;SET IDENTITY_INSERT dbo.DimCustomer ON;&#xA;&#xA;INSERT INTO dbo.DimCustomer&#xA;(&#x9;dimCustomerKey,&#xA;&#x9;CustomerID,&#xA;&#x9;FirstName,&#xA;&#x9;LastName,&#xA;&#x9;Gender,&#xA;&#x9;EmailAddress,&#xA;&#x9;Address,&#xA;&#x9;City,&#xA;&#x9;StateProvince,&#xA;&#x9;Country,&#xA;&#x9;PostalCode,&#xA;&#x9;PhoneNumber,&#xA;&#x9;CreatedDate,&#xA;&#x9;CreatedBy,&#xA;&#x9;ModifiedDate,&#xA;&#x9;ModifiedBy&#xA;&#x9;&#xA;)&#xA;VALUES&#xA;(&#xA;-1,&#xA;newid()&#xA;,'Unknown'&#xA;,'Unknown'&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;);&#xA;&#xA;SET IDENTITY_INSERT dbo.DimCustomer OFF;&#xA;GO&#xA;&#xA;&#xA;INSERT INTO dbo.DimCustomer&#xA;(&#x9;CustomerID,&#xA;&#x9;FirstName,&#xA;&#x9;LastName,&#xA;&#x9;Gender,&#xA;&#x9;EmailAddress,&#xA;&#x9;Address,&#xA;&#x9;City,&#xA;&#x9;StateProvince,&#xA;&#x9;Country,&#xA;&#x9;PostalCode,&#xA;&#x9;PhoneNumber,&#xA;&#x9;CreatedDate,&#xA;&#x9;CreatedBy,&#xA;&#x9;ModifiedDate,&#xA;&#x9;ModifiedBy&#xA;)&#xA;SELECT &#xA;&#x9;CustomerID,&#xA;&#x9;FirstName,&#xA;&#x9;LastName,&#xA;&#x9;Gender,&#xA;&#x9;EmailAddress,&#xA;&#x9;Address,&#xA;&#x9;City,&#xA;&#x9;StateProvince,&#xA;&#x9;Country,&#xA;&#x9;PostalCode,&#xA;&#x9;PhoneNumber,&#xA;DATEADD(dd,DATEDIFF(dd,GETDATE(), '2013-01-01'),GETDATE()) AS CreatedDate&#xA;,'company\SQLServerServiceAccount' AS CreatedBy&#xA;,NULL AS ModifiedDate&#xA;,NULL AS ModifiedBy&#xA;FROM dbo.Customer&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\DimProduct"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{F6D388E7-F456-42AE-8048-F2634868FFE4}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="DimProduct"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{98396F0D-9642-4205-AB27-A36CC7B287D2}"
+          SQLTask:SqlStatementSource="IF EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'DimProduct')&#xA;BEGIN&#xA;&#x9;DROP TABLE dbo.DimProduct;&#xA;END&#xA;GO&#xA;&#xA;CREATE TABLE dbo.DimProduct(&#xA;&#x9;dimProductKey INT IDENTITY(1,1) CONSTRAINT PK_dimProduct PRIMARY KEY CLUSTERED NOT NULL,&#xA;&#x9;ProductID int NULL,&#xA;&#x9;[Product] [nvarchar](50) NULL,&#xA;&#x9;ProductTypeID int NULL,&#xA;&#x9;ProductType nvarchar(50) NULL,&#xA;&#x9;ProductCategoryID int Null,&#xA;&#x9;ProductCategory nvarchar(50) null,&#xA;&#x9;[Color] [nvarchar](50) NULL,&#xA;&#x9;[Style] [nvarchar](50) NULL,&#xA;&#x9;[UnitofMeasureID] [int] NULL,&#xA;&#x9;[Weight] [numeric](18, 4) NULL,&#xA;&#x9;[Price] [numeric](18, 2) NULL,&#xA;&#x9;[Cost] [numeric](18, 2) NULL,&#xA;&#x9;[CreatedDate] [datetime] NULL,&#xA;&#x9;[CreatedBy] [nvarchar](255) NULL,&#xA;&#x9;[ModifiedDate] [datetime] NULL,&#xA;&#x9;[ModifiedBy] [nvarchar](255) NULL,&#xA;&#x9;[WholesalePrice] [numeric](18, 2) NULL&#xA;) ON [PRIMARY]&#xA;GO&#xA;&#xA;&#xA;DELETE FROM dbo.DimProduct;&#xA;GO&#xA;&#xA;/***How to reseed an identity column***/&#xA;DBCC CHECKIDENT (&quot;dbo.DimProduct&quot;, RESEED, 0);&#xA;GO&#xA;&#xA;IF EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'dimProductView')&#xA;BEGIN&#xA;DROP VIEW dbo.dimProductView;&#xA;END&#xA;GO&#xA;&#xA;/***How to create a view***/&#xA;CREATE VIEW dbo.dimProductView&#xA;AS&#xA;SELECT &#xA;dimProductKey,&#xA;&#x9;ProductID,&#xA;&#x9;Product,&#xA;&#x9;ProductTypeID,&#xA;&#x9;ProductType,&#xA;&#x9;ProductCategoryID,&#xA;&#x9;ProductCategory,&#xA;&#x9;Color,&#xA;&#x9;Style,&#xA;&#x9;UnitofMeasureID,&#xA;&#x9;Weight,&#xA;&#x9;Price,&#xA;&#x9;Cost,&#xA;&#x9;CreatedDate,&#xA;&#x9;CreatedBy,&#xA;&#x9;ModifiedDate,&#xA;&#x9;ModifiedBy,&#xA;&#x9;WholesalePrice&#xA;FROM DimProduct&#xA;GO&#xA;SET IDENTITY_INSERT dbo.DimProduct ON;&#xA;&#xA;INSERT INTO dbo.DimProduct&#xA;(&#xA;&#x9;dimProductKey,&#xA;&#x9;ProductID,&#xA;&#x9;Product,&#xA;&#x9;ProductTypeID,&#xA;&#x9;ProductType,&#xA;&#x9;ProductCategoryID,&#xA;&#x9;ProductCategory,&#xA;&#x9;Color,&#xA;&#x9;Style,&#xA;&#x9;UnitofMeasureID,&#xA;&#x9;Weight,&#xA;&#x9;Price,&#xA;&#x9;Cost,&#xA;&#x9;CreatedDate,&#xA;&#x9;CreatedBy,&#xA;&#x9;ModifiedDate,&#xA;&#x9;ModifiedBy,&#xA;&#x9;WholesalePrice&#xA;)&#xA;VALUES&#xA;(&#xA;-1 &#xA;,0&#xA;,'Unknown'&#xA;,0&#xA;,'Unknown'&#xA;,0&#xA;,'Unknown'&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;);&#xA;&#xA;SET IDENTITY_INSERT dbo.DimProduct OFF;&#xA;GO&#xA;&#xA;&#xA;INSERT INTO dbo.DimProduct&#xA;(&#x9;ProductID,&#xA;&#x9;Product,&#xA;&#x9;ProductTypeID,&#xA;&#x9;ProductType,&#xA;&#x9;ProductCategoryID,&#xA;&#x9;ProductCategory,&#xA;&#x9;Color,&#xA;&#x9;Style,&#xA;&#x9;UnitofMeasureID,&#xA;&#x9;Weight,&#xA;&#x9;Price,&#xA;&#x9;Cost,&#xA;&#x9;CreatedDate,&#xA;&#x9;CreatedBy,&#xA;&#x9;ModifiedDate,&#xA;&#x9;ModifiedBy,&#xA;&#x9;WholesalePrice&#xA;)&#xA;SELECT &#xA;&#x9;ProductID,&#xA;&#x9;Product,&#xA;&#x9;dbo.ProductType.ProductTypeID,&#xA;&#x9;dbo.ProductType.ProductType,&#xA;&#x9;dbo.ProductCategory.ProductCategoryID,&#xA;&#x9;dbo.ProductCategory.ProductCategory,&#xA;&#x9;Color,&#xA;&#x9;Style,&#xA;&#x9;UnitofMeasureID,&#xA;&#x9;Weight,&#xA;&#x9;Price,&#xA;&#x9;Cost,&#xA;&#x9;DATEADD(dd,DATEDIFF(dd,GETDATE(), '2013-01-01'),GETDATE()) AS CreatedDate&#xA;&#x9;,'company\SQLServerServiceAccount' AS CreatedBy&#xA;&#x9;,NULL AS ModifiedDate&#xA;&#x9;,NULL AS ModifiedBy,&#xA;&#x9;WholesalePrice&#xA;&#xA;FROM dbo.Product&#xA;INNER JOIN dbo.ProductType&#xA;on dbo.product.ProductTypeID = dbo.ProductType.ProductTypeID&#xA;inner join dbo.ProductCategory&#xA;on dbo.ProductType.ProductCategoryID= dbo.ProductCategory.ProductCategoryID&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\DimReseller"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{46340D40-2FB0-4C4C-8C58-1580094B11D1}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="DimReseller"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{98396F0D-9642-4205-AB27-A36CC7B287D2}"
+          SQLTask:SqlStatementSource="&#xA;IF EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'DimReseller')&#xA;BEGIN&#xA;&#x9;DROP TABLE dbo.DimReseller;&#xA;END&#xA;GO&#xA;&#xA;CREATE TABLE dbo.DimReseller(&#xA;&#x9;dimResellerKey INT IDENTITY(1,1) CONSTRAINT PK_dimReseller PRIMARY KEY CLUSTERED NOT NULL,&#xA;&#x9;[ResellerID] [uniqueidentifier] NULL,&#xA;&#x9;[ResellerName] [nvarchar](255) NULL,&#xA;&#x9;[Contact] [nvarchar](255) NULL,&#xA;&#x9;[EmailAddress] [nvarchar](255) NULL,&#xA;&#x9;[Address] [nvarchar](255) NULL,&#xA;&#x9;[City] [nvarchar](255) NULL,&#xA;&#x9;[StateProvince] [nvarchar](255) NULL,&#xA;&#x9;[Country] [nvarchar](255) NULL,&#xA;&#x9;[PostalCode] [nvarchar](255) NULL,&#xA;&#x9;[PhoneNumber] [nvarchar](20) NULL,&#xA;&#x9;[CreatedDate] [datetime] NULL,&#xA;&#x9;[CreatedBy] [nvarchar](255) NULL,&#xA;&#x9;[ModifiedDate] [datetime] NULL,&#xA;&#x9;[ModifiedBy] [nvarchar](255) NULL&#xA;) ON [PRIMARY]&#xA;GO&#xA;&#xA;&#xA;DELETE FROM dbo.DimReseller;&#xA;GO&#xA;&#xA;/***How to reseed an identity column***/&#xA;DBCC CHECKIDENT (&quot;dbo.DimReseller&quot;, RESEED, 0);&#xA;GO&#xA;&#xA;&#xA;IF EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'dimResellerView')&#xA;BEGIN&#xA;DROP VIEW dbo.dimResellerView;&#xA;END&#xA;GO&#xA;&#xA;/***How to create a view***/&#xA;CREATE VIEW dbo.dimResellerView&#xA;AS&#xA;SELECT &#xA;&#x9;dimResellerKey,&#xA;&#x9;ResellerID,&#xA;&#x9;ResellerName,&#xA;&#x9;Contact,&#xA;&#x9;EmailAddress,&#xA;&#x9;Address,&#xA;&#x9;City,&#xA;&#x9;StateProvince,&#xA;&#x9;Country,&#xA;&#x9;PostalCode,&#xA;&#x9;PhoneNumber,&#xA;&#x9;CreatedDate,&#xA;&#x9;CreatedBy,&#xA;&#x9;ModifiedDate,&#xA;&#x9;ModifiedBy&#xA;FROM DimReseller&#xA;GO&#xA;&#xA;SET IDENTITY_INSERT dbo.DimReseller ON;&#xA;&#xA;INSERT INTO dbo.DimReseller&#xA;(&#xA;&#x9;dimResellerKey,&#xA;&#x9;[ResellerID],&#xA;&#x9;[ResellerName],&#xA;&#x9;[Contact],&#xA;&#x9;[EmailAddress],&#xA;&#x9;[Address],&#xA;&#x9;[City],&#xA;&#x9;[StateProvince],&#xA;&#x9;[Country],&#xA;&#x9;[PostalCode],&#xA;&#x9;[PhoneNumber],&#xA;&#x9;[CreatedDate],&#xA;&#x9;[CreatedBy],&#xA;&#x9;[ModifiedDate],&#xA;&#x9;[ModifiedBy]&#xA;)&#xA;VALUES&#xA;(&#xA;-1 &#xA;,newid()&#xA;,'Unknown'&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;);&#xA;&#xA;SET IDENTITY_INSERT dbo.DimReseller OFF;&#xA;GO&#xA;&#xA;&#xA;INSERT INTO dbo.DimReseller&#xA;(&#xA;&#x9;ResellerID,&#xA;&#x9;ResellerName,&#xA;&#x9;Contact,&#xA;&#x9;EmailAddress,&#xA;&#x9;Address,&#xA;&#x9;City,&#xA;&#x9;StateProvince,&#xA;&#x9;Country,&#xA;&#x9;PostalCode,&#xA;&#x9;PhoneNumber,&#xA;&#x9;CreatedDate,&#xA;&#x9;CreatedBy,&#xA;&#x9;ModifiedDate,&#xA;&#x9;ModifiedBy&#xA;)&#xA;SELECT &#xA;&#x9;ResellerID,&#xA;&#x9;replace(dbo.Reseller.ResellerName,'Mississipi','Mississippi'), &#xA;&#x9;Contact,&#xA;&#x9;EmailAddress,&#xA;&#x9;Address,&#xA;&#x9;City,&#xA;&#x9;StateProvince,&#xA;&#x9;Country,&#xA;&#x9;PostalCode,&#xA;&#x9;PhoneNumber,&#xA;DATEADD(dd,DATEDIFF(dd,GETDATE(), '2013-01-01'),GETDATE()) AS CreatedDate&#xA;,'company\SQLServerServiceAccount' AS CreatedBy&#xA;,NULL AS ModifiedDate&#xA;,NULL AS ModifiedBy&#xA;FROM dbo.Reseller&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\DimStore"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{21F9E6D5-4635-431D-9908-7D0D5BBDB78A}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="DimStore"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{98396F0D-9642-4205-AB27-A36CC7B287D2}"
+          SQLTask:SqlStatementSource="&#xA;IF EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'DimStore')&#xA;BEGIN&#xA;&#x9;DROP TABLE dbo.DimStore;&#xA;END&#xA;GO&#xA;&#xA;CREATE TABLE dbo.DimStore(&#xA;dimStoreKey INT IDENTITY(1,1) CONSTRAINT PK_dimStore PRIMARY KEY CLUSTERED NOT NULL,&#xA;&#x9;StoreID int NULL,&#xA;&#x9;StoreNumber int NULL,&#xA;&#x9;StoreManager nvarchar(255) NULL,&#xA;&#x9;Address nvarchar(255) NULL,&#xA;&#x9;City nvarchar(255) NULL,&#xA;&#x9;StateProvince nvarchar(255) NULL,&#xA;&#x9;Country nvarchar(255) NULL,&#xA;&#x9;PostalCode nvarchar(255) NULL,&#xA;&#x9;PhoneNumber nvarchar(20) NULL,&#xA;&#x9;CreatedDate datetime NULL,&#xA;&#x9;CreatedBy nvarchar(255) NULL,&#xA;&#x9;ModifiedDate datetime NULL,&#xA;&#x9;ModifiedBy nvarchar(255) NULL&#xA;) ON [PRIMARY]&#xA;GO&#xA;&#xA;&#xA;DELETE FROM dbo.DimStore;&#xA;GO&#xA;&#xA;/***How to reseed an identity column***/&#xA;DBCC CHECKIDENT (&quot;dbo.DimStore&quot;, RESEED, 0);&#xA;GO&#xA;&#xA;IF EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'dimStoreView')&#xA;BEGIN&#xA;DROP VIEW dbo.dimStoreView;&#xA;END&#xA;GO&#xA;&#xA;/***How to create a view***/&#xA;CREATE VIEW dbo.dimStoreView&#xA;AS&#xA;SELECT &#xA;dimStoreKey,&#xA;&#x9;StoreID,&#xA;&#x9;StoreNumber,&#xA;&#x9;StoreManager,&#xA;&#x9;Address,&#xA;&#x9;City,&#xA;&#x9;StateProvince,&#xA;&#x9;Country,&#xA;&#x9;PostalCode,&#xA;&#x9;PhoneNumber,&#xA;&#x9;CreatedDate,&#xA;&#x9;CreatedBy,&#xA;&#x9;ModifiedDate,&#xA;&#x9;ModifiedBy&#xA;FROM DimStore&#xA;GO&#xA;SET IDENTITY_INSERT dbo.DimStore ON;&#xA;&#xA;INSERT INTO dbo.DimStore&#xA;(&#xA;&#x9;dimStoreKey,&#xA;&#x9;StoreID,&#xA;&#x9;StoreNumber,&#xA;&#x9;StoreManager,&#xA;&#x9;Address,&#xA;&#x9;City,&#xA;&#x9;StateProvince,&#xA;&#x9;Country,&#xA;&#x9;PostalCode,&#xA;&#x9;PhoneNumber,&#xA;&#x9;CreatedDate,&#xA;&#x9;CreatedBy,&#xA;&#x9;ModifiedDate,&#xA;&#x9;ModifiedBy&#xA;)&#xA;VALUES&#xA;(&#xA;-1 &#xA;,0&#xA;,0&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;,null&#xA;);&#xA;&#xA;SET IDENTITY_INSERT dbo.DimStore OFF;&#xA;GO&#xA;&#xA;&#xA;INSERT INTO dbo.DimStore&#xA;(&#x9;StoreID,&#xA;&#x9;StoreNumber,&#xA;&#x9;StoreManager,&#xA;&#x9;Address,&#xA;&#x9;City,&#xA;&#x9;StateProvince,&#xA;&#x9;Country,&#xA;&#x9;PostalCode,&#xA;&#x9;PhoneNumber,&#xA;&#x9;CreatedDate,&#xA;&#x9;CreatedBy,&#xA;&#x9;ModifiedDate,&#xA;&#x9;ModifiedBy&#xA;)&#xA;SELECT &#xA;&#x9;StoreID,&#xA;&#x9;StoreNumber ,&#xA;&#x9;StoreManager,&#xA;&#x9;Address,&#xA;&#x9;City,&#xA;&#x9;StateProvince,&#xA;&#x9;Country,&#xA;&#x9;PostalCode,&#xA;&#x9;PhoneNumber,&#xA;&#x9;DATEADD(dd,DATEDIFF(dd,GETDATE(), '2013-01-01'),GETDATE()) AS CreatedDate&#xA;&#x9;,'company\SQLServerServiceAccount' AS CreatedBy&#xA;&#x9;,NULL AS ModifiedDate&#xA;&#x9;,NULL AS ModifiedBy&#xA;&#xA;FROM dbo.Store&#xA;&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint]"
+      DTS:CreationName=""
+      DTS:DTSID="{01F0A197-0F3D-4803-BC58-A08A0260CF86}"
+      DTS:From="Package\DimChannel"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint"
+      DTS:To="Package\DimProduct" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 1]"
+      DTS:CreationName=""
+      DTS:DTSID="{64669998-D712-4171-ADA7-5D5B0BE6F738}"
+      DTS:From="Package\DimProduct"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 1"
+      DTS:To="Package\DimStore" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 2]"
+      DTS:CreationName=""
+      DTS:DTSID="{D4B47B7F-3A84-4010-9D96-96F0335241E7}"
+      DTS:From="Package\DimStore"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 2"
+      DTS:To="Package\DimReseller" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 3]"
+      DTS:CreationName=""
+      DTS:DTSID="{76FC3489-736D-49F8-98B1-03BD332567BE}"
+      DTS:From="Package\DimReseller"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 3"
+      DTS:To="Package\DimCustomer" />
+  </DTS:PrecedenceConstraints>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
+<!--If you manually edit this section and make a mistake, you can delete it. -->
+<!--The package will still be able to load normally but the previous layout information will be lost and the designer will automatically re-arrange the elements on the design surface.-->
+<Objects
+  Version="8">
+  <!--Each node below will contain properties that do not affect runtime behavior.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="16" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="135.2,41.6"
+          Id="Package\DimChannel"
+          TopLeft="55.7948738414156,36.9252538591414" />
+        <NodeLayout
+          Size="142.4,41.6"
+          Id="Package\DimCustomer"
+          TopLeft="576.41027755286,264.969705587795" />
+        <NodeLayout
+          Size="132.8,41.6"
+          Id="Package\DimProduct"
+          TopLeft="193.333340424758,90.068689165044" />
+        <NodeLayout
+          Size="134.4,41.6"
+          Id="Package\DimReseller"
+          TopLeft="463.384632381463,202.513136432381" />
+        <NodeLayout
+          Size="121.6,41.6"
+          Id="Package\DimStore"
+          TopLeft="347.897448658238,137.866668670346" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint]"
+          TopLeft="190.994873841416,57.7252538591414">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="68.7384665833424,32.3434353059026"
+              Start="0,0"
+              End="68.7384665833424,24.8434353059026">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="64.7384665833424,0" />
+                  <mssgle:CubicBezierSegment
+                    Point1="64.7384665833424,0"
+                    Point2="68.7384665833424,0"
+                    Point3="68.7384665833424,4" />
+                  <mssgle:LineSegment
+                    End="68.7384665833424,24.8434353059026" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 1]"
+          TopLeft="326.133340424758,110.868689165044">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="82.56410823348,26.997979505302"
+              Start="0,0"
+              End="82.56410823348,19.497979505302">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="78.56410823348,0" />
+                  <mssgle:CubicBezierSegment
+                    Point1="78.56410823348,0"
+                    Point2="82.56410823348,0"
+                    Point3="82.56410823348,4" />
+                  <mssgle:LineSegment
+                    End="82.56410823348,19.497979505302" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 2]"
+          TopLeft="408.697448658238,179.466668670346">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="121.887183723225,23.046467762035"
+              Start="0,0"
+              End="121.887183723225,15.546467762035">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,7.5232338810175" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,7.5232338810175"
+                    Point2="0,11.5232338810175"
+                    Point3="4,11.5232338810175" />
+                  <mssgle:LineSegment
+                    End="117.887183723225,11.5232338810175" />
+                  <mssgle:CubicBezierSegment
+                    Point1="117.887183723225,11.5232338810175"
+                    Point2="121.887183723225,11.5232338810175"
+                    Point3="121.887183723225,15.5232338810175" />
+                  <mssgle:LineSegment
+                    End="121.887183723225,15.546467762035" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 3]"
+          TopLeft="597.784632381463,223.313136432381">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="49.8256451713969,41.656569155414"
+              Start="0,0"
+              End="49.8256451713969,34.156569155414">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="45.8256451713969,0" />
+                  <mssgle:CubicBezierSegment
+                    Point1="45.8256451713969,0"
+                    Point2="49.8256451713969,0"
+                    Point3="49.8256451713969,4" />
+                  <mssgle:LineSegment
+                    End="49.8256451713969,34.156569155414" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>
